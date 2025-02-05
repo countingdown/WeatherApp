@@ -1,28 +1,28 @@
 # Оглавление
 - [Обзор проекта](#обзор-проекта-weatherapp)
-- [Используемые технологии](#используемые-технологииинструменты)
+- [Используемые технологии](#используемые-технологи)
 - [Использование OpenWeatherMap-API](#использование-openweathermap-api)
 - [Интерфейс Приложения](#интерфейс-приложения)
 
 
 ## Обзор проекта (WeatherApp)
 
-
-
 **Техническое задание проекта** -  [https://zhukovsd.github.io/java-backend-learning-course/Projects/WeatherViewer/](https://zhukovsd.github.io/java-backend-learning-course/Projects/WeatherViewer/)
 
 **Суть проекта** - Веб-приложение для посмотра текущей погоды для заданной локации. Зарегистрированные пользователи могут добавить выбранные локации с текущей погодой на стартовую страницу,
 а также удалить локацию из избранных.  
 
-## Используемые технологии/инструменты:
+## Используемые технологии:
 
 •	[Gradle](https://gradle.org/)                                       
 
 •	[Hibernate](https://hibernate.org/)
 
-•	[JUnit5](https://junit.org/junit5/)
-
 •	[Spring](https://spring.io/)
+
+•	[Spring Boot](https://spring.io/projects/spring-boot)
+
+•	[Spring Security](https://spring.io/projects/spring-security)
 
 •	[Apache Tomcat](https://tomcat.apache.org/)
 
@@ -66,8 +66,8 @@
 
 4. *Стартовая страница зарегистрированного пользователя (с добавленными локациями)* - кнопку личного кабинета,  кнопку logout, а также форму поиска локаций.
 
-![image](https://github.com/user-attachments/assets/d554f985-2ab2-43ea-bd0b-69a9e21df172)
- 
+![image](https://github.com/user-attachments/assets/b7d63622-34aa-4f5e-9da2-8918452a0153)
+
 5. *Страница найденных локаций по критериям поиска* - отображает до 5 найденных совпадений с критериям поиска.
 
 ![image](https://github.com/user-attachments/assets/87dcbf9e-deaf-4d01-a2b7-85bf8d3fa514)
