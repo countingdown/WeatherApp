@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>WeatherApp – Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+</head>
+
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" data-th-href="@{/index}">
+            <img th:src="@{/images/weather-app.png}" alt="" width="30" height="24" class="d-inline-block align-text-top">
+            WeatherApp
+        </a>
+        <div class="d-flex align-items-center">
+            <a class="btn btn-outline-warning" data-th-href="@{/login}" sec:authorize="!isAuthenticated()">Log in</a>
+            <span class="navbar-text me-3" data-th-text="${#authentication.name}" sec:authorize="isAuthenticated()">s</span>
+            <a class="btn btn-outline-danger" th:href="@{/logout}" sec:authorize="isAuthenticated()">Log out</a>
+        </div>
+    </div>
+</nav>
+
+<section class="bg-light py-3 py-md-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+                <div class="card border border-light-subtle rounded-3 shadow-sm">
+                    <div class="card-body p-3 p-md-4 p-xl-5">
+                        <div class="text-center mb-3">
+                            <a data-th-href="@{/index}">
+                                <img th:src="@{/images/weather-app.png}" alt="" width="90" height="72">
+                            </a>
+                        </div>
+                        <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Enter your details to register</h2>
+
+                        <form data-th-action="@{/registration}" method="post" class="form-horizontal">
+                            <div class="row gy-2 overflow-hidden">
+
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" id="username" name="username" class="form-control" data-th-value="${userForm?.getUsername()}" placeholder="Enter login" required>
+                                        <label for="username" class="form-label">Login</label>
+                                    </div>
+                                </div>
+
+                                <div class="text-danger" data-th-if="${loginError}">
+                                    <ul>
+                                        <li data-th-text="${loginError}"></li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" id="password" name="password" class="form-control" data-th-value="${userForm?.getPassword()}" placeholder="Enter password" required>
+                                        <label for="password" class="form-label">Password</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control" data-th-value="${userForm?.getPasswordConfirm()}" placeholder="Enter your password again" required>
+                                        <label for="passwordConfirm" class="form-label">Confirm Password</label>
+                                    </div>
+                                </div>
+
+                                <div class="text-danger" data-th-if="${passwordError}">
+                                    <ul>
+                                        <li data-th-text="${passwordError}"></li>
+                                    </ul>
+                                </div>
+
+                                <div data-th-if="${errors}">
+                                    <ul>
+                                        <li class="text-danger" data-th-each="error: ${errors}" data-th-text="${error}"></li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-grid my-3">
+                                        <button type="submit" class="btn btn-dark">Sign up</button>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <p class="m-0 text-secondary text-center">Already have an account? <a data-th-href="@{/login}" class="link-primary text-decoration-none">Log in</a></p>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
