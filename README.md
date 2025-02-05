@@ -71,3 +71,8 @@
 5. *Страница найденных локаций по критериям поиска* - отображает до 5 найденных совпадений с критериям поиска.
 
 ![image](https://github.com/user-attachments/assets/87dcbf9e-deaf-4d01-a2b7-85bf8d3fa514)
+
+6. *Страница, показываемая при поиске несуществующей локации*.
+
+![image](https://github.com/user-attachments/assets/5a6b8c8c-fb2f-420b-8643-c593364b20bc)
+
