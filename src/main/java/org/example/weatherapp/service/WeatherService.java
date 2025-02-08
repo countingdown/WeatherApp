@@ -45,7 +45,6 @@ public class WeatherService {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    @Transactional
     public List<LocationSearchRes> findCities(String city) throws URISyntaxException, IOException, InterruptedException {
         String cityGeoUrlEd = String.format("%s?q=%s&limit=5&appid=%s", geoUrl, city, apiKey);
         String cityGeoUrl = cityGeoUrlEd.replace(" ", "+");
@@ -55,12 +54,14 @@ public class WeatherService {
                 .GET()
                 .build();
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        List<LocationSearchRes> locations = objectMapper.readValue(response.body(), new TypeReference<List<LocationSearchRes>>() {});
+        List<LocationSearchRes> locations = objectMapper.readValue(response.body(), new TypeReference<>() {});
 
         if (!locations.isEmpty()) {
             return locations;
@@ -92,14 +93,14 @@ public class WeatherService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            WeatherSearchRes resWeather = objectMapper.readValue(weather, new TypeReference<WeatherSearchRes>() {});
+            WeatherSearchRes resWeather = objectMapper.readValue(weather, new TypeReference<>() {});
 
             resWeather.setName(location.getName());
             resWeather.setCountry(location.getCountry());
             resWeather.setLat(location.getLatitude());
             resWeather.setLon(location.getLongitude());
-            String descrip = resWeather.getWeather().getFirst().getDescription();
-            String upperCaseDescription = descrip.substring(0, 1).toUpperCase() + descrip.substring(1);
+            String description = resWeather.getWeather().getFirst().getDescription();
+            String upperCaseDescription = description.substring(0, 1).toUpperCase() + description.substring(1);
             resWeather.getWeather().getFirst().setDescription(upperCaseDescription);
 
             result.add(resWeather);
@@ -116,8 +117,10 @@ public class WeatherService {
                 .GET()
                 .build();
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
 
         return response.body();
     }

@@ -2,12 +2,9 @@ package org.example.weatherapp.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "locations")
@@ -27,11 +24,11 @@ public class Location {
     private String country;
 
     @JsonProperty("lat")
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     private String latitude;
 
     @JsonProperty("lon")
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     private String longitude;
 
     @ManyToOne
