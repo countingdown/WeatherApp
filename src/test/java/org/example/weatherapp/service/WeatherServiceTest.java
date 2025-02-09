@@ -1,7 +1,7 @@
 package org.example.weatherapp.service;
 
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.example.weatherapp.model.Location;
 import org.example.weatherapp.model.User;
@@ -11,13 +11,14 @@ import org.example.weatherapp.results.LocationSearchRes;
 import org.example.weatherapp.results.WeatherSearchRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,13 +30,13 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 class WeatherServiceTest {
 
-    @Autowired
+    @InjectMocks
     private WeatherService weatherService;
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
-    @Autowired
+    @Mock
     private LocationRepository locationRepository;
 
     @Mock
@@ -61,67 +62,65 @@ class WeatherServiceTest {
     @Test
     public void testFindCities() throws URISyntaxException, IOException, InterruptedException {
         String mockResponse = """
-        [
-            {
-                "name":"London",
-                "local_names":{
-                   "cv":"Лондон",
-                   "az":"London",
-                   "ru":"Лондон"
-                },
-                "lat":51.5073219,
-                "lon":-0.1276474,
-                "country":"GB",
-                "state":"England"
-            },
-            {
-                "name":"City of London",
-                "local_names":{
-                   "es":"City de Londres",
-                   "ru":"Сити",
-                   "en":"City of London",
-                },
-                "lat":51.5156177,
-                "lon":-0.0919983,
-                "country":"GB",
-                "state":"England"
-            },
-            {
-                "name":"London",
-                "local_names":{
-                   "fr":"London",
-                   "en":"London",
-                   "ru":"Лондон"
-                },
-                "lat":42.9832406,
-                "lon":-81.243372,
-                "country":"CA",
-                "state":"Ontario"
-            },
-            {
-                "name":"Chelsea",
-                "local_names":{
-                   "fr":"Chelsea",
-                   "ru":"Челси",
-                   "en":"Chelsea"
-                },
-                "lat":51.4875167,
-                "lon":-0.1687007,
-                "country":"GB",
-                "state":"England"
-            },
-            {
-                "name":"London",
-                "lat":37.1289771,
-                "lon":-84.0832646,
-                "country":"US",
-                "state":"Kentucky"
-            }
-        ]
+                [
+                        {
+                            "name":"London",
+                            "local_names":{
+                               "cv":"Лондон",
+                               "az":"London",
+                               "ru":"Лондон"
+                            },
+                            "lat":51.5073219,
+                            "lon":-0.1276474,
+                            "country":"GB",
+                            "state":"England"
+                        },
+                        {
+                            "name":"City of London",
+                            "local_names":{
+                               "es":"City de Londres",
+                               "ru":"Сити",
+                               "en":"City of London"
+                            },
+                            "lat":51.5156177,
+                            "lon":-0.0919983,
+                            "country":"GB",
+                            "state":"England"
+                        },
+                        {
+                            "name":"London",
+                            "local_names":{
+                               "fr":"London",
+                               "en":"London",
+                               "ru":"Лондон"
+                            },
+                            "lat":42.9832406,
+                            "lon":-81.243372,
+                            "country":"CA",
+                            "state":"Ontario"
+                        },
+                        {
+                            "name":"Chelsea",
+                            "local_names":{
+                               "fr":"Chelsea",
+                               "ru":"Челси",
+                               "en":"Chelsea"
+                            },
+                            "lat":51.4875167,
+                            "lon":-0.1687007,
+                            "country":"GB",
+                            "state":"England"
+                        },
+                        {
+                            "name":"London",
+                            "lat":37.1289771,
+                            "lon":-84.0832646,
+                            "country":"US",
+                            "state":"Kentucky"
+                        }
+                    ]
         """;
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.body()).thenReturn(mockResponse);
-        when(openWeatherApiService.getStringHttpResponse(anyString())).thenReturn(httpResponse);
+        when(openWeatherApiService.getStringHttpResponse(anyString())).thenReturn(mockResponse);
 
         List<LocationSearchRes> locations = weatherService.findCities("London");
 
@@ -147,7 +146,6 @@ class WeatherServiceTest {
     @Test
     public void testFindTemperatures() throws URISyntaxException, IOException, InterruptedException {
         Location location = new Location("London", "GB", "51.5073219", "-0.1276474", testUser);
-        locationRepository.save(location);
 
         String mockWeatherResponse = """
             {
@@ -159,7 +157,7 @@ class WeatherServiceTest {
                    {
                       "id": 501,
                       "main": "Rain",
-                      "description": "moderate rain",
+                      "description": "red rain",
                       "icon": "10d"
                    }
                 ],
@@ -201,13 +199,15 @@ class WeatherServiceTest {
             }
         """;
         when(openWeatherApiService.getWeather(anyString(), anyString())).thenReturn(mockWeatherResponse);
+        when(locationRepository.findByUser(null)).thenReturn(List.of(location));
+
 
         List<WeatherSearchRes> temperatures = weatherService.findTemperatures();
 
         assertAll(
                 () -> assertEquals(1, temperatures.size()),
                 () -> assertEquals("London", temperatures.getFirst().getName()),
-                () -> assertEquals("Moderate rain", temperatures.getFirst().getWeather().getFirst().getDescription())
+                () -> assertEquals("Red rain", temperatures.getFirst().getWeather().getFirst().getDescription())
         );
     }
 
@@ -220,6 +220,15 @@ class WeatherServiceTest {
 
         Location deletedLocation = locationRepository.findByLatitudeAndLongitudeAndUser("51.5073219", "-0.1276474", testUser);
         assertNull(deletedLocation);
+    }
+
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public OpenWeatherApiService openWeatherApiService() {
+            return mock(OpenWeatherApiService.class);
+        }
     }
 
 }

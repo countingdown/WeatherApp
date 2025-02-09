@@ -39,7 +39,7 @@ public class OpenWeatherApiService {
         return response.body();
     }
 
-    public HttpResponse<String> getStringHttpResponse(String city) throws URISyntaxException, IOException, InterruptedException {
+    public String getStringHttpResponse(String city) throws URISyntaxException, IOException, InterruptedException {
         String cityGeoUrlEd = String.format("%s?q=%s&limit=5&appid=%s", geoUrl, city, apiKey);
         String cityGeoUrl = cityGeoUrlEd.replace(" ", "+");
 
@@ -52,6 +52,6 @@ public class OpenWeatherApiService {
         try (HttpClient client = HttpClient.newHttpClient()) {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         }
-        return response;
+        return response.body();
     }
 }

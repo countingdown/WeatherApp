@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +35,11 @@ public class WeatherService {
     }
 
     public List<LocationSearchRes> findCities(String city) throws URISyntaxException, IOException, InterruptedException {
-        HttpResponse<String> response = openWeatherApiService.getStringHttpResponse(city);
+        String response = openWeatherApiService.getStringHttpResponse(city);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        List<LocationSearchRes> locations = objectMapper.readValue(response.body(), new TypeReference<>() {});
+        List<LocationSearchRes> locations = objectMapper.readValue(response, new TypeReference<>() {});
 
         if (!locations.isEmpty()) {
             return locations;
