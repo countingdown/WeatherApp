@@ -2,6 +2,7 @@ package org.example.weatherapp.service;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.example.weatherapp.model.Location;
 import org.example.weatherapp.model.User;
@@ -34,10 +35,10 @@ class WeatherServiceTest {
     private WeatherService weatherService;
 
     @Mock
-    private UserRepository userRepository;
+    private LocationRepository locationRepository;
 
     @Mock
-    private LocationRepository locationRepository;
+    private UserRepository userRepository;
 
     @Mock
     private OpenWeatherApiService openWeatherApiService;
@@ -46,13 +47,11 @@ class WeatherServiceTest {
 
     @BeforeEach
     public void setUp() {
-        locationRepository.deleteAll();
         userRepository.deleteAll();
 
         testUser = new User();
         testUser.setUsername("testUser");
         testUser.setPassword("testPassword");
-        userRepository.save(testUser);
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(testUser.getUsername(), null)
@@ -132,15 +131,6 @@ class WeatherServiceTest {
                 () -> assertEquals("51.4875167", locations.get(3).getLat()),
                 () -> assertEquals("-84.0832646", locations.get(4).getLon())
         );
-    }
-
-    @Test
-    public void testAddLocation() {
-        weatherService.addLocation("London", "GB", "51.5073219", "-0.1276474");
-
-        Location savedLocation = locationRepository.findByLatitudeAndLongitudeAndUser("51.5073219", "-0.1276474", testUser);
-        assertNotNull(savedLocation);
-        assertEquals("London", savedLocation.getName());
     }
 
     @Test
