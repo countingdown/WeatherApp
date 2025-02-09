@@ -10,17 +10,13 @@ import org.example.weatherapp.repository.LocationRepository;
 import org.example.weatherapp.repository.UserRepository;
 import org.example.weatherapp.results.LocationSearchRes;
 import org.example.weatherapp.results.WeatherSearchRes;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,32 +28,15 @@ public class WeatherService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
 
-    @Value("${open_weather.api.key}")
-    private String apiKey;
+    private final OpenWeatherApiService openWeatherApiService;
 
-    @Value("${open_weather.api.inf.url}")
-    private String infUrl;
-
-    @Value("${open_weather.api.geo.url}")
-    private String geoUrl;
 
     public String getCurrentUser() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     public List<LocationSearchRes> findCities(String city) throws URISyntaxException, IOException, InterruptedException {
-        String cityGeoUrlEd = String.format("%s?q=%s&limit=5&appid=%s", geoUrl, city, apiKey);
-        String cityGeoUrl = cityGeoUrlEd.replace(" ", "+");
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(cityGeoUrl))
-                .GET()
-                .build();
-
-        HttpResponse<String> response;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
+        HttpResponse<String> response = openWeatherApiService.getStringHttpResponse(city);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -89,7 +68,7 @@ public class WeatherService {
         List<WeatherSearchRes> result = new ArrayList<>();
 
         for (Location location : foundLocations) {
-            String weather = getWeather(location.getLatitude(), location.getLongitude());
+            String weather = openWeatherApiService.getWeather(location.getLatitude(), location.getLongitude());
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -108,22 +87,6 @@ public class WeatherService {
         return result;
     }
 
-
-    public String getWeather(String latitude, String longitude) throws URISyntaxException, IOException, InterruptedException {
-        String weatherUrl = String.format("%s?lat=%s&lon=%s&units=metric&appid=%s", infUrl, latitude, longitude, apiKey);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(weatherUrl))
-                .GET()
-                .build();
-
-        HttpResponse<String> response;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
-
-        return response.body();
-    }
 
     @Transactional
     public void delLocation(String latitude, String longitude) {
